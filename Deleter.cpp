@@ -1,125 +1,100 @@
-ï»¿#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <string>
-#include <vector>
+#include "Deleter.h"
 
-using namespace std;
-using namespace std::filesystem;
+void Deleter::del(path path, vector<string>& ext) {
+	if (exists(path)) {
+		if (checker(path.filename().string(), ext)) {
+			if (is_directory(path)) remove_all(path);
+			else remove(path);
+			return;
+		}
+		for (auto& it : directory_iterator(path)) {
+			if (is_directory(it.path())) {
+				if (checker(it.path().filename().string(), ext)) {
+					remove_all(it.path());
+				}
+				else del(it.path(), ext);
+			}
+			else {
+				if (checker(it.path().filename().string(), ext)) {
+					remove(it.path());
+				}
+			}
+		}
+	}
+	else {
+		return;
+	}
+}
 
-class Deleter {
-    bool stop = false;
+bool Deleter::checker(string name, vector<string>& del_list) {
+	for (int i = 0; i < del_list.size(); i++) {
+		int left = 0, right = 0;
+		int l = 0, rs = 0;
+		bool flag = true;
+		bool ending = false;
+		int last_rs = 0;
+		bool starting = false;
+		bool flag_for_starting = false;
+		while (right < del_list[i].length()) {
+			while (right < del_list[i].length() && del_list[i][right] != '*') {
+				right++;
+			}
+			if (right == 0) starting = true;
+			if (right == 0) l++;
+			if (right == del_list[i].length() - 1) ending = true;
+			string sub = del_list[i].substr(left, right - left);
+			rs = sub.size();
+			while (rs + l < name.length() && name.substr(l, rs) != sub) {
+				l++;
+			}
+			last_rs = rs;
+			if (name.substr(l, rs) != sub) {
+				right = del_list[i].length();
+				flag = false;
+			}
+			else {
+				if (starting && (l != 0) || !starting && (l == 0)) flag_for_starting = true;
+				left = right + 1;
+				right = left;
+				rs = 0;
+			}
+		}
+		if (flag_for_starting && flag && ((ending && ((l + last_rs) < (name.length() - 1))) || (!ending && ((l + last_rs) >= (name.length() - 1))))) return true;
+	}
+	return false;
+}
 
-    void del(path path, vector<string>& ext) {
-        if (exists(path)) {
-            if (checker(path.filename().string(), ext)) {
-                if (is_directory(path)) remove_all(path);
-                else remove(path);
-                return;
-            }
-            for (auto& it : directory_iterator(path)) {
-                if (is_directory(it.path())) {
-                    if (checker(it.path().filename().string(), ext)) {
-                        remove_all(it.path());
-                    }
-                    else del(it.path(), ext);
-                }
-                else {
-                    if (checker(it.path().filename().string(), ext)) {
-                        remove(it.path());
-                    }
-                }
-            }
-        }
-        else {
-            return;
-        }
-    }
-
-    bool checker(string name, vector<string>& del_list) {
-        for (int i = 0; i < del_list.size(); i++) {
-            int left = 0, right = 0;
-            int l = 0, rs = 0;
-            bool flag = true;
-            bool ending = false;
-            int last_rs = 0;
-            bool starting = false;
-            bool flag_for_starting = false;
-            while (right < del_list[i].length()) {
-                while (right < del_list[i].length() && del_list[i][right] != '*') {
-                    right++;
-                }
-                if (right == 0) starting = true;
-                if (right == 0) l++;
-                if (right == del_list[i].length() - 1) ending = true;
-                string sub = del_list[i].substr(left, right - left);
-                //cout << sub << endl;
-                rs = sub.size();
-                while (rs + l < name.length() && name.substr(l, rs) != sub) {
-                    //cout << name.substr(l, rs) << endl;
-                    l++;
-                }
-                //cout << name.substr(l, rs) << endl;
-                last_rs = rs;
-                if (name.substr(l, rs) != sub) {
-                    right = del_list[i].length();
-                    flag = false;
-                }
-                else {
-                    if (starting && (l != 0) || !starting && (l == 0)) flag_for_starting = true;
-                    left = right + 1;
-                    right = left;
-                    //l++;
-                    rs = 0;
-                }
-            }
-            if (flag_for_starting && flag && ((ending && ((l + last_rs) < (name.length() - 1))) || (!ending && ((l + last_rs) >= (name.length() - 1))))) return true;
-        }
-        return false;
-    }
-
-public:
-    void ui_asking() {
-        setlocale(LC_ALL, "Ru");
-        while (!stop) {
-            cout << "Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ ÑÐ¿Ð¸ÑÐ¾Ðº Ñ„Ð°Ð¹Ð»Ð¾Ð²/Ð¿Ð°Ð¿Ð¾Ðº [1]\nÐ—Ð°ÐºÑ€Ñ‹Ñ‚ÑŒ [2]\nÐ’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ: ";
-            string com;
-            getline(cin, com);
-            if (com == "1") {
-                string path, d;
-                vector<string> del_vec;
-                cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¿ÑƒÑ‚ÑŒ: ";
-                getline(cin, path);
-                if (exists(path)) {
-                    cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÑÐ¿Ð¸ÑÐ¾Ðº ÐºÐ»ÑŽÑ‡ÐµÐ²Ñ‹Ñ… ÑÐ»Ð¾Ð² Ð´Ð»Ñ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ñ (ÐµÑÐ»Ð¸ ÑÐ¿Ð¸ÑÐ¾Ðº Ð·Ð°ÐºÐ¾Ð½Ñ‡ÐµÐ½, Ñ‚Ð¾ Ð²Ð²ÐµÐ´Ð¸Ñ‚Ðµ '.'): " << endl;
-                    do {
-                        getline(cin, d);
-                        del_vec.push_back(d);
-                    } while (d != ".");
-                    del(path, del_vec);
-                }
-                else {
-                    cout << "Ð¢Ð°ÐºÐ¾Ð³Ð¾ Ð¿ÑƒÑ‚Ð¸ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚" << endl;
-                }
-            }
-            else if (com == "2") {
-                stop = true;
-            }
-            else {
-                cout << "Ð¢Ð°ÐºÐ¾Ð¹ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚!" << endl;
-            }
-        }
-        cout << "Ð Ð°Ð±Ð¾Ñ‚Ð° Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð°." << endl;
-        cin.ignore(); //Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ° Ð±ÑƒÑ„ÐµÑ€Ð°
-        cin.get(); //Ð¶Ð´Ñ‘Ñ‚ Ð½Ð°Ð¶Ð°Ñ‚Ð¸Ñ Enter
-    }
-};
-
-int main()
-{
-    Deleter del;
-    del.ui_asking();
-
-    return 0;
-
+void Deleter::ui_asking() {
+	setlocale(LC_ALL, "Ru");
+	while (!stop) {
+		cout << "Óäàëèòü ñïèñîê ôàéëîâ/ïàïîê [1]\nÇàêðûòü [2]\nÂûáåðèòå êîìàíäó: ";
+		string com;
+		getline(cin, com);
+		if (com == "1") {
+			string path, d;
+			vector<string> del_vec;
+			cout << "Ââåäèòå ïóòü: ";
+			getline(cin, path);
+			if (exists(path)) {
+				cout << "Ââåäèòå ñïèñîê êëþ÷åâûõ ñëîâ äëÿ óäàëåíèÿ (åñëè ñïèñîê çàêîí÷åí, òî ââåäèòå '.'): " << endl;
+				do {
+					getline(cin, d);
+					del_vec.push_back(d);
+				} while (d != ".");
+				del(path, del_vec);
+			}
+			else {
+				cout << "Òàêîãî ïóòè íå ñóùåñòâóåò" << endl;
+			}
+		}
+		else if (com == "2") {
+			stop = true;
+		}
+		else {
+			cout << "Òàêîé êîìàíäû íå ñóùåñòâóåò!" << endl;
+		}
+	}
+	cout << "Ðàáîòà çàâåðøåíà." << endl;
+	cin.ignore(); //î÷èñòêà áóôåðà
+	cin.get(); //æä¸ò íàæàòèÿ Enter
 }
