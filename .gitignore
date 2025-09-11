@@ -8,7 +8,7 @@ build/
 .idea/
 *.sln
 *.vcxproj
-*.vcxproj.filters
+*.filters
 *.user
 
 fol/
