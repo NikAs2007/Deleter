@@ -1,5 +1,6 @@
 #ifndef DELETER_H
 #define DELETER_H
+//добавл€€ем исключени€
 
 #include <iostream>
 #include <fstream>
@@ -12,7 +13,7 @@ using namespace std::filesystem;
 class Deleter {
     bool stop = false;
 
-    void del(path path, vector<string>& ext);
+    void del(path path, vector<string>& ext, vector<string>& exeptions);
 
     bool checker(string name, vector<string>& del_list);
 
