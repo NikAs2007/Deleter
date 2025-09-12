@@ -71,11 +71,15 @@ void Deleter::ui_asking() {
 		string com;
 		getline(cin, com);
 		if (com == "1") {
-			string path, d = "";
+			string path, d = "", repath = "";
 			vector<string> del_vec;
 			vector<string> exeptions;
 			cout << "¬ведите путь: ";
 			getline(cin, path);
+			for (int c = 0; c < path.length(); ++c) {
+				if (path[c] != '"') repath += path[c];
+			}
+			path = repath;
 			if (exists(path)) {
 				//тут ошибка
 				cout << "¬ведите список ключевых слов дл€ удалени€ (если список закончен, то введите '.'): " << endl;
