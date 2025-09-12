@@ -1,6 +1,6 @@
 #include "Deleter.h"
 
-void Deleter::del(path path, vector<string>& ext) {
+void Deleter::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	if (exists(path)) {
 		if (checker(path.filename().string(), ext)) {
 			if (is_directory(path)) remove_all(path);
@@ -12,7 +12,7 @@ void Deleter::del(path path, vector<string>& ext) {
 				if (checker(it.path().filename().string(), ext)) {
 					remove_all(it.path());
 				}
-				else del(it.path(), ext);
+				else del(it.path(), ext, exeptions);
 			}
 			else {
 				if (checker(it.path().filename().string(), ext)) {
@@ -27,6 +27,7 @@ void Deleter::del(path path, vector<string>& ext) {
 }
 
 bool Deleter::checker(string name, vector<string>& del_list) {
+	//тут ошибка
 	for (int i = 0; i < del_list.size(); i++) {
 		int left = 0, right = 0;
 		int l = 0, rs = 0;
@@ -73,15 +74,23 @@ void Deleter::ui_asking() {
 		if (com == "1") {
 			string path, d;
 			vector<string> del_vec;
+			vector<string> exeptions;
 			cout << "Введите путь: ";
 			getline(cin, path);
 			if (exists(path)) {
+				//тут ошибка
 				cout << "Введите список ключевых слов для удаления (если список закончен, то введите '.'): " << endl;
 				do {
 					getline(cin, d);
 					del_vec.push_back(d);
 				} while (d != ".");
-				del(path, del_vec);
+				//del(path, del_vec);
+				cout << "Введите список ключевых слов для исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'): " << endl;
+				do {
+					getline(cin, d);
+					exeptions.push_back(d);
+				} while (d != ".");
+				del(path, del_vec, exeptions);
 			}
 			else {
 				cout << "Такого пути не существует" << endl;
