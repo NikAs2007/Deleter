@@ -2,20 +2,20 @@
 
 void Deleter::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	if (exists(path)) {
-		if (checker(path.filename().string(), ext)) {
+		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			if (is_directory(path)) remove_all(path);
 			else remove(path);
 			return;
 		}
 		for (auto& it : directory_iterator(path)) {
 			if (is_directory(it.path())) {
-				if (checker(it.path().filename().string(), ext)) {
+				if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
 					remove_all(it.path());
 				}
 				else del(it.path(), ext, exeptions);
 			}
 			else {
-				if (checker(it.path().filename().string(), ext)) {
+				if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
 					remove(it.path());
 				}
 			}
@@ -72,7 +72,7 @@ void Deleter::ui_asking() {
 		string com;
 		getline(cin, com);
 		if (com == "1") {
-			string path, d;
+			string path, d = "";
 			vector<string> del_vec;
 			vector<string> exeptions;
 			cout << "¬ведите путь: ";
@@ -81,14 +81,19 @@ void Deleter::ui_asking() {
 				//тут ошибка
 				cout << "¬ведите список ключевых слов дл€ удалени€ (если список закончен, то введите '.'): " << endl;
 				do {
-					getline(cin, d);
-					del_vec.push_back(d);
+					if (d != ".") {
+						getline(cin, d);
+						del_vec.push_back(d);
+					}
 				} while (d != ".");
+				d = "";
 				//del(path, del_vec);
-				cout << "¬ведите список ключевых слов дл€ исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'): " << endl;
+				cout << "¬ведите список ключевых слов дл€ исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'): ";
 				do {
-					getline(cin, d);
-					exeptions.push_back(d);
+					if (d != ".") {
+						getline(cin, d);
+						exeptions.push_back(d);
+					}
 				} while (d != ".");
 				del(path, del_vec, exeptions);
 			}
