@@ -27,7 +27,6 @@ void Deleter::del(path path, vector<string>& ext, vector<string>& exeptions) {
 }
 
 bool Deleter::checker(string name, vector<string>& del_list) {
-	//тут ошибка
 	for (int i = 0; i < del_list.size(); i++) {
 		int left = 0, right = 0;
 		int l = 0, rs = 0;
@@ -60,7 +59,7 @@ bool Deleter::checker(string name, vector<string>& del_list) {
 				rs = 0;
 			}
 		}
-		if (flag_for_starting && flag && ((ending && ((l + last_rs) < (name.length() - 1))) || (!ending && ((l + last_rs) >= (name.length() - 1))))) return true;
+		if (flag_for_starting && flag && ((ending && ((l + last_rs) < (name.length()))) || (!ending && ((l + last_rs) >= (name.length() - 1))))) return true;
 	}
 	return false;
 }
@@ -88,7 +87,7 @@ void Deleter::ui_asking() {
 				} while (d != ".");
 				d = "";
 				//del(path, del_vec);
-				cout << "¬ведите список ключевых слов дл€ исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'): ";
+				cout << "¬ведите список ключевых слов дл€ исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'):";
 				do {
 					if (d != ".") {
 						getline(cin, d);
