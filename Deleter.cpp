@@ -7,22 +7,21 @@ void Deleter::del(path path, vector<string>& ext, vector<string>& exeptions) {
 			else remove(path);
 			return;
 		}
-		for (auto& it : directory_iterator(path)) {
-			if (is_directory(it.path())) {
-				if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-					remove_all(it.path());
+		if (!checker(path.filename().string(), exeptions)) {
+			for (auto& it : directory_iterator(path)) {
+				if (is_directory(it.path())) {
+					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
+						remove_all(it.path());
+					}
+					else del(it.path(), ext, exeptions);
 				}
-				else del(it.path(), ext, exeptions);
-			}
-			else {
-				if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-					remove(it.path());
+				else {
+					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
+						remove(it.path());
+					}
 				}
 			}
 		}
-	}
-	else {
-		return;
 	}
 }
 
@@ -65,7 +64,6 @@ bool Deleter::checker(string name, vector<string>& del_list) {
 }
 
 void Deleter::ui_asking() {
-	setlocale(LC_ALL, "Ru");
 	while (!stop) {
 		cout << "Удалить список файлов/папок [1]\nЗакрыть [2]\nВыберите команду: ";
 		string com;

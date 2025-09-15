@@ -1,12 +1,13 @@
 #ifndef DELETER_H
 #define DELETER_H
-//добавл€€ем исключени€
 
 #include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <locale>
+#include <windows.h>
 using namespace std;
 using namespace std::filesystem;
 
