@@ -17,6 +17,10 @@ class Deleter {
 
     void del(path path, vector<string>& ext, vector<string>& exeptions);
 
+    void ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
+
+    void cre(path path, vector<string>& ext, vector<string>& exeptions, string name = "File");
+
     bool checker(string name, vector<string>& del_list);
 
 public:
