@@ -45,7 +45,7 @@ void Deleter::ren(path path, vector<string>& ext, vector<string>& exeptions, str
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
 							rename(it.path(), it.path().parent_path().string() + '\\' + name);
 						}
-						ren(it.path(), ext, exeptions, name);
+						ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name);
 					}
 					else {
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
@@ -69,8 +69,8 @@ void Deleter::ren(path path, vector<string>& ext, vector<string>& exeptions, str
 						}
 						if (first_dot) new_name += to_string(num++);
 						rename(it.path(), new_name);
-						if (is_directory(it.path())) {
-							ren(it.path(), ext, exeptions, name);
+						if (is_directory(new_name)) {
+							ren(new_name, ext, exeptions, name);
 						}
 					}
 				}
