@@ -53,21 +53,24 @@ void Deleter::ren(path path, vector<string>& ext, vector<string>& exeptions, str
 						}
 					}
 				}
-				//не забыть что в папке уже могут быть такие файлы name11.txt например
 				else {
 					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-						string new_name = it.path().parent_path().string() + "\\";
-						bool first_dot = true;
-						for (int i = 0; i < name.length(); i++) {
-							if (name[i] != '.') {
-								new_name += name[i];
+						string new_name;
+						bool first_dot;
+						do {
+							new_name = it.path().parent_path().string() + "\\";
+							first_dot = true;
+							for (int i = 0; i < name.length(); i++) {
+								if (name[i] != '.') {
+									new_name += name[i];
+								}
+								else if (first_dot) {
+									new_name += to_string(num++) + name[i];
+									first_dot = false;
+								}
 							}
-							else if (first_dot){
-								new_name += to_string(num++) + name[i];
-								first_dot = false;
-							}
-						}
-						if (first_dot) new_name += to_string(num++);
+							if (first_dot) new_name += to_string(num++);
+						} while (exists(new_name));
 						rename(it.path(), new_name);
 						if (is_directory(new_name)) {
 							ren(new_name, ext, exeptions, name);
