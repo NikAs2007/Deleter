@@ -1,4 +1,4 @@
-﻿#include "Deleter.h"
+﻿#include "FileManager.h"
 
 int main()
 {
@@ -6,7 +6,7 @@ int main()
     //SetConsoleCP(65001);
     setlocale(LC_ALL, "Ru");
 
-    Deleter del;
+    FileManager del;
     del.ui_asking();
     return 0;
 }

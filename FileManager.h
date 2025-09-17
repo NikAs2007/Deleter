@@ -1,5 +1,5 @@
-#ifndef DELETER_H
-#define DELETER_H
+#ifndef FILEMANAGER_H
+#define FILEMANAGER_H
 
 #include <iostream>
 #include <fstream>
@@ -11,7 +11,7 @@
 using namespace std;
 using namespace std::filesystem;
 
-class Deleter {
+class FileManager {
     bool stop = false;
 
     void del(path path, vector<string>& ext, vector<string>& exeptions);
@@ -26,4 +26,4 @@ public:
     void ui_asking();
 };
 
-#endif //DELETER_H
+#endif //FILEMANAGER_H

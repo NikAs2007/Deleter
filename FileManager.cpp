@@ -1,6 +1,6 @@
-#include "Deleter.h"
+#include "FileManager.h"
 
-void Deleter::del(path path, vector<string>& ext, vector<string>& exeptions) {
+void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			if (is_directory(path)) remove_all(path);
@@ -25,7 +25,7 @@ void Deleter::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	}
 }
 
-void Deleter::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
+void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			rename(path, path.parent_path().string() + '\\' + name);
@@ -82,7 +82,7 @@ void Deleter::ren(path path, vector<string>& ext, vector<string>& exeptions, str
 	}
 }
 
-void Deleter::cre(path path, string name, int count_f) {
+void FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
 		if (count_f < 1) return;
 		if (count_f == 1) {
@@ -113,7 +113,7 @@ void Deleter::cre(path path, string name, int count_f) {
 	}
 }
 
-bool Deleter::checker(string name, vector<string>& del_list) {
+bool FileManager::checker(string name, vector<string>& del_list) {
 	for (int i = 0; i < del_list.size(); i++) {
 		int left = 0, right = 0;
 		int l = 0, rs = 0;
@@ -151,7 +151,7 @@ bool Deleter::checker(string name, vector<string>& del_list) {
 	return false;
 }
 
-void Deleter::ui_asking() {
+void FileManager::ui_asking() {
 	while (!stop) {
 		cout << "Создать файлы [1]\nПереименовать файлы [2]\nУдалить список файлов/папок [3]\nЗакрыть [4]\nВыберите команду: ";
 		string com;
