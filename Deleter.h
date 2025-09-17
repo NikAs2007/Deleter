@@ -1,6 +1,5 @@
 #ifndef DELETER_H
 #define DELETER_H
-//начинаем добавлять renaming and creating
 
 #include <iostream>
 #include <fstream>
