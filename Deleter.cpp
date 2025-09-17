@@ -91,8 +91,23 @@ void Deleter::cre(path path, string name, int count_f) {
 		else {
 			int num = 1;
 			for (int i = 0; i < count_f; i++) {
-				while (exists(path.string() + '\\' + name + to_string(num))) ++num;
-				ofstream{ path.string() + '\\' + name + to_string(num) };
+				string new_name;
+				bool first_dot;
+				do {
+					new_name = path.string() + "\\";
+					first_dot = true;
+					for (int i = 0; i < name.length(); i++) {
+						if (name[i] != '.') {
+							new_name += name[i];
+						}
+						else if (first_dot) {
+							new_name += to_string(num++) + name[i];
+							first_dot = false;
+						}
+					}
+					if (first_dot) new_name += to_string(num++);
+				} while (exists(new_name));
+				ofstream{ new_name };
 			}
 		}
 	}
