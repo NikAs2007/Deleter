@@ -82,6 +82,22 @@ void Deleter::ren(path path, vector<string>& ext, vector<string>& exeptions, str
 	}
 }
 
+void Deleter::cre(path path, string name, int count_f) {
+	if (exists(path)) {
+		if (count_f < 1) return;
+		if (count_f == 1) {
+			ofstream{ path.string() + '\\' + name };
+		}
+		else {
+			int num = 1;
+			for (int i = 0; i < count_f; i++) {
+				while (exists(path.string() + '\\' + name + to_string(num))) ++num;
+				ofstream{ path.string() + '\\' + name + to_string(num) };
+			}
+		}
+	}
+}
+
 bool Deleter::checker(string name, vector<string>& del_list) {
 	for (int i = 0; i < del_list.size(); i++) {
 		int left = 0, right = 0;
@@ -127,7 +143,32 @@ void Deleter::ui_asking() {
 		getline(cin, com);
 		if (com == "1") {
 			//
-			stop = false;
+			string path, d = "", name, repath = "";
+			cout << "Введите путь: ";
+			getline(cin, path);
+			for (int c = 0; c < path.length(); ++c) {
+				if (path[c] != '"') repath += path[c];
+			}
+			path = repath;
+			if (exists(path)) {
+				cout << "Введите имя создаваемого объекта: ";
+				getline(cin, name);
+				cout << "Введите количество создаваемых файлов: ";
+				getline(cin, d);
+				bool right_count = true;
+				for (char x : d) {
+					if (!isdigit(x)) right_count = false;
+				}
+				if (right_count) {
+					cre(path, name, stoi(d));
+				}
+				else {
+					cout << "Принимаются только числа!" << endl;
+				}
+			}
+			else {
+				cout << "Такого пути не существует" << endl;
+			}
 		}
 		else if (com == "2") {
 			//
