@@ -83,28 +83,30 @@ void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
-			rename(path, path.parent_path().string() + '\\' + name);
+			if ((is_directory(path) && (renf == ren_dir || renf == ren_dir_files)) || (!is_directory(path) && (renf == ren_files || renf == ren_dir_files))) rename(path, path.parent_path().string() + '\\' + name); 
 			path = path.parent_path().string() + '\\' + name;
 		}
 		if (!checker(path.filename().string(), exeptions)) {
 			int count_files = 0;
+			int count_folders = 0;
 			for (auto& it : directory_iterator(path)) {
 				if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-					++count_files;
+					if ((renf == ren_files) || (renf == ren_dir_files) && !is_directory(it.path())) ++count_files;
+					else if ((renf == ren_dir) || (renf == ren_dir_files) && is_directory(it.path())) ++count_folders;
 				}
 			}
 			int num = 1;
 			for (auto& it : directory_iterator(path)) {
-				if (count_files <= 1) {
+				if (count_files + count_folders <= 1) {
 					if (is_directory(it.path())) {
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-							rename(it.path(), it.path().parent_path().string() + '\\' + name);
+							if (renf == ren_dir || renf == ren_dir_files) rename(it.path(), it.path().parent_path().string() + '\\' + name);
 						}
-						ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name);
+						if (recf == recursion_on) ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name);
 					}
 					else {
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-							rename(it.path(), it.path().parent_path().string() + '\\' + name);
+							if (renf == ren_dir_files || renf == ren_files) rename(it.path(), it.path().parent_path().string() + '\\' + name);
 						}
 					}
 				}
@@ -126,9 +128,9 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 							}
 							if (first_dot) new_name += to_string(num++);
 						} while (exists(new_name));
-						rename(it.path(), new_name);
+						if (is_directory(it.path()) && (renf == ren_dir || renf == ren_dir_files) || !is_directory(it.path()) && (renf == ren_files || renf == ren_dir_files)) rename(it.path(), new_name);
 						if (is_directory(new_name)) {
-							ren(new_name, ext, exeptions, name);
+							if (recf == recursion_on) ren(new_name, ext, exeptions, name);
 						}
 					}
 				}
