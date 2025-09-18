@@ -28,7 +28,7 @@ bool FileManager::is_correct_flags_string(string flags_string) {
 
 void FileManager::flags_parser(string all_flags) {
 	if (!is_correct_flags_string(all_flags)) {
-		cout << "Ошибка чтения флагов." << endl;
+		cout << "Ошибка чтения флагов.\n" << endl;
 		return;
 	}
 	string flag;
@@ -52,7 +52,7 @@ void FileManager::flags_parser(string all_flags) {
 		else if (flag == "-rend") renf = ren_dir;
 		else if (flag == "-renfd") renf = ren_dir_files;
 	}
-	cout << "Флаги успешно установлены." << endl;
+	cout << "Флаги успешно установлены.\n" << endl;
 }
 
 void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
@@ -221,7 +221,7 @@ bool FileManager::checker(string name, vector<string>& del_list) {
 
 void FileManager::ui_asking() {
 	while (!stop) {
-		cout << "Создать файлы [1]\nПереименовать файлы [2]\nУдалить список файлов/папок [3]\nЗадать флаги [4]\nЗакрыть [5]\nВыберите команду: ";
+		cout << "Создать файлы [1]\nПереименовать файлы [2]\nУдалить список файлов/папок [3]\nЗадать флаги [4]\nПосмотреть информацию о флагах [5]\nЗакрыть [6]\nВыберите команду: ";
 		string com;
 		getline(cin, com);
 		if (com == "1") {
@@ -244,13 +244,14 @@ void FileManager::ui_asking() {
 				}
 				if (right_count) {
 					cre(path, name, stoi(d));
+					cout << "Создано.\n" << endl;
 				}
 				else {
 					cout << "Принимаются только числа!" << endl;
 				}
 			}
 			else {
-				cout << "Такого пути не существует" << endl;
+				cout << "Такого пути не существует\n" << endl;
 			}
 		}
 		else if (com == "2") {
@@ -284,9 +285,10 @@ void FileManager::ui_asking() {
 					}
 				} while (d != ".");
 				ren(path, ren_vec, exeptions, new_name);
+				cout << "Переименовано\n" << endl;
 			}
 			else {
-				cout << "Такого пути не существует" << endl;
+				cout << "Такого пути не существует\n" << endl;
 			}
 		}
 		else if (com == "3") {
@@ -317,25 +319,84 @@ void FileManager::ui_asking() {
 					}
 				} while (d != ".");
 				del(path, del_vec, exeptions);
+				cout << "Удалено\n"  << endl;
 			}
 			else {
-				cout << "Такого пути не существует" << endl;
+				cout << "Такого пути не существует\n" << endl;
 			}
 		}
-		else if(com == "4") {
+		else if (com == "4") {
 			string parsing_str;
 			cout << "Введите флаги: ";
 			getline(cin, parsing_str);
 			flags_parser(parsing_str);
 		}
 		else if (com == "5") {
+			string d;
+			cout << "Выбор:\nИнфо [1]\nФлаги [2]\nВвод: ";
+			getline(cin, d);
+			if (d == "1") {
+				cout << "Информация о флагах: \n" << endl;
+
+				cout << "-rec -> включает рекусривный обход всех вложенных папок для каждой функции" << endl;
+				cout << "-recn -> выключает" << endl;
+				cout << endl;
+
+				cout << "-deld -> теперь удаляются только directories" << endl;
+				cout << "-delf -> удаляются только files" << endl;
+				cout << "-delfd -> удаляются directories и files" << endl;
+				cout << endl;
+
+				cout << "-cref -> создаются files" << endl;
+				cout << "-cref -> создаются directories" << endl;
+				cout << endl;
+
+				cout << "-rend -> переименовывает только directories" << endl;
+				cout << "-renf -> переименовывает только files" << endl;
+				cout << "-renfd -> переименовывает files и directories" << endl;
+				cout << endl;
+			}
+			else if (d == "2") {
+				cout << "Флаги: \n" << endl;
+
+				if (recf == recursion_on) cout << "-rec: on" << endl;
+				else cout << "-rec: off" << endl;
+				if (recf == recursion_off) cout << "-recn: on" << endl;
+				else cout << "-recn: off\n";
+				cout << endl;
+
+				if (delf == del_dir) cout << "-deld: on" << endl;
+				else cout << "-deld: off" << endl;
+				if (delf == del_files) cout << "-delf: on" << endl;
+				else cout << "-delf: off" << endl;
+				if (delf == del_dir_files) cout << "-delfd: on" << endl;
+				else cout << "-delfd: off\n";
+				cout << endl;
+
+				if (cref == cre_files) cout << "-cref: on" << endl;
+				else cout << "-cref: off" << endl;
+				if (cref == cre_dir) cout << "-cref: on" << endl;
+				else cout << "-cred: off\n";
+				cout << endl;
+
+				if (renf == ren_dir) cout << "-rend: on" << endl;
+				else cout << "-rend: off" << endl;
+				if (renf == ren_files) cout << "-renf: on" << endl;
+				else cout << "-renf: off" << endl;
+				if (renf == ren_dir_files) cout << "-renfd: on" << endl;
+				else cout << "-renfd: off\n";
+				cout << endl;
+			}
+			else cout << "Такой команды нет.\n" << endl;
+		}
+		else if (com == "6") {
 			stop = true;
 		}
 		else {
-			cout << "Такой команды не существует!" << endl;
+			cout << "Такой команды не существует!\n" << endl;
 		}
 	}
-	cout << "Работа завершена." << endl;
+	cout << "Работа завершена.\n" << endl;
 	cin.ignore(); //очистка буфера
 	cin.get(); //ждёт нажатия Enter
 }
