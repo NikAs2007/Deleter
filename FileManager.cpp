@@ -11,17 +11,48 @@ FileManager::FileManager() {
 bool FileManager::is_correct_flags_string(string flags_string) {
 	string flag;
 	int i = 0;
+	vector<string> avaliable_flags = { "-rec", "-recn", "-deld", "-delf", "-delfd", "-cref", "-cred", "-renf", "-rend", "-renfd" };
 	while (i < flags_string.length()) {
-		flag = "";
-		while (flags_string[i] != '-' && i < flags_string.length()) {
+		while (i < flags_string.length() && flags_string[i] != '-') {
 			if (flags_string[i] != ' ') return false;
 			i++;
 		}
-		while (flags_string[i] != ' ' && i < flags_string.length()) {
-			flag += flags_string[i];
+		flag = "";
+		while (i < flags_string.length() && flags_string[i] != ' ') {
+			flag += flags_string[i++];
 		}
-		//if (flag)
+		if (find(avaliable_flags.begin(), avaliable_flags.end(), flag) == avaliable_flags.end() && flag != "") return false;
 	}
+	return true;
+}
+
+void FileManager::flags_parser(string all_flags) {
+	if (!is_correct_flags_string(all_flags)) {
+		cout << "Ошибка чтения флагов." << endl;
+		return;
+	}
+	string flag;
+	int i = 0;
+	while (i < all_flags.length()) {
+		while (i < all_flags.length() && all_flags[i] != '-') {
+			i++;
+		}
+		flag = "";
+		while (i < all_flags.length() && all_flags[i] != ' ') {
+			flag += all_flags[i++];
+		}
+		if (flag == "-rec") recf = recursion_on;
+		else if (flag == "-recn") recf = recursion_off;
+		else if (flag == "-deld") delf = del_dir;
+		else if (flag == "-delf") delf = del_files;
+		else if (flag == "-delfd") delf = del_dir_files;
+		else if (flag == "-cref") cref = cre_files;
+		else if (flag == "-cred") cref = cre_dir;
+		else if (flag == "-renf") renf = ren_files;
+		else if (flag == "-rend") renf = ren_dir;
+		else if (flag == "-renfd") renf = ren_dir_files;
+	}
+
 }
 
 void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
