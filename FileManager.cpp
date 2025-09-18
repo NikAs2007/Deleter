@@ -1,5 +1,29 @@
 #include "FileManager.h"
 
+FileManager::FileManager() {
+	stop = false;
+	recf = recursion_on;
+	delf = del_dir_files;
+	cref = cre_files;
+	renf = ren_dir_files;
+}
+
+bool FileManager::is_correct_flags_string(string flags_string) {
+	string flag;
+	int i = 0;
+	while (i < flags_string.length()) {
+		flag = "";
+		while (flags_string[i] != '-' && i < flags_string.length()) {
+			if (flags_string[i] != ' ') return false;
+			i++;
+		}
+		while (flags_string[i] != ' ' && i < flags_string.length()) {
+			flag += flags_string[i];
+		}
+		//if (flag)
+	}
+}
+
 void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
@@ -113,6 +137,7 @@ void FileManager::cre(path path, string name, int count_f) {
 	}
 }
 
+//есть ошибка в чекере: исключение Hah1 это еще и Hah10 и др.
 bool FileManager::checker(string name, vector<string>& del_list) {
 	for (int i = 0; i < del_list.size(); i++) {
 		int left = 0, right = 0;
@@ -153,7 +178,7 @@ bool FileManager::checker(string name, vector<string>& del_list) {
 
 void FileManager::ui_asking() {
 	while (!stop) {
-		cout << "Создать файлы [1]\nПереименовать файлы [2]\nУдалить список файлов/папок [3]\nЗакрыть [4]\nВыберите команду: ";
+		cout << "Создать файлы [1]\nПереименовать файлы [2]\nУдалить список файлов/папок [3]\nЗадать флаги [4]\nЗакрыть [5]\nВыберите команду: ";
 		string com;
 		getline(cin, com);
 		if (com == "1") {
@@ -254,14 +279,20 @@ void FileManager::ui_asking() {
 				cout << "Такого пути не существует" << endl;
 			}
 		}
-		else if (com == "4") {
+		else if(com == "4") {
+			string parsing_str;
+			cout << "Введите флаги: ";
+			getline(cin, parsing_str);
+			flags_parser(parsing_str);
+		}
+		else if (com == "5") {
 			stop = true;
 		}
 		else {
 			cout << "Такой команды не существует!" << endl;
 		}
 	}
-	//cout << "Работа завершена." << endl;
+	cout << "Работа завершена." << endl;
 	cin.ignore(); //очистка буфера
 	cin.get(); //ждёт нажатия Enter
 }

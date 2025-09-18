@@ -1,3 +1,6 @@
+//Добавить обработку ошибок при вводе
+//Добавить флаги: -rec/-recn - рекурсивный обход, -deld/-delf/-delfd - флаги для удаления, -cref/-cred - флаги для создания, -renf/-rend/renfd - флаги для переименования
+//Наверно стоит поменять поиск первой точки на поиск последней
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
@@ -12,7 +15,29 @@ using namespace std;
 using namespace std::filesystem;
 
 class FileManager {
-    bool stop = false;
+    enum Flag {
+        recursion_on,
+        recursion_off,
+        del_dir,
+        del_files,
+        del_dir_files,
+        cre_files,
+        cre_dir,
+        ren_files,
+        ren_dir,
+        ren_dir_files
+    };
+
+    Flag recf;
+    Flag delf;
+    Flag cref;
+    Flag renf;
+
+    bool stop;
+
+    bool is_correct_flags_string(string flags_string);
+
+    void flags_parser(string all_flags);
 
     void del(path path, vector<string>& ext, vector<string>& exeptions);
 
@@ -23,6 +48,7 @@ class FileManager {
     bool checker(string name, vector<string>& del_list);
 
 public:
+    FileManager();
     void ui_asking();
 };
 
