@@ -141,7 +141,8 @@ void FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
 		if (count_f < 1) return;
 		if (count_f == 1) {
-			ofstream{ path.string() + '\\' + name };
+			if (cref == cre_files) ofstream{ path.string() + '\\' + name };
+			else if (cref == cre_dir) create_directory(path.string() + '\\' + name);
 		}
 		else {
 			int num = 1;
@@ -162,7 +163,8 @@ void FileManager::cre(path path, string name, int count_f) {
 					}
 					if (first_dot) new_name += to_string(num++);
 				} while (exists(new_name));
-				ofstream{ new_name };
+				if (cref == cre_files) ofstream{ new_name };
+				else if (cref == cre_dir) create_directory(new_name);
 			}
 		}
 	}
