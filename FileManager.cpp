@@ -143,6 +143,13 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 void FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
 		if (count_f < 1) return;
+		if (recf == recursion_on) {
+			for (auto& it : directory_iterator(path)) {
+				if (is_directory(it.path())) {
+					cre(it.path(), name, count_f);
+				}
+			}
+		}
 		if (count_f == 1) {
 			if (cref == cre_files) ofstream{ path.string() + '\\' + name };
 			else if (cref == cre_dir) create_directory(path.string() + '\\' + name);
