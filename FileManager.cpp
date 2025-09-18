@@ -52,27 +52,27 @@ void FileManager::flags_parser(string all_flags) {
 		else if (flag == "-rend") renf = ren_dir;
 		else if (flag == "-renfd") renf = ren_dir_files;
 	}
-
+	cout << "‘лаги успешно установлены." << endl;
 }
 
 void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
-			if (is_directory(path)) remove_all(path);
-			else remove(path);
+			if ((delf == del_dir || delf == del_dir_files) && is_directory(path)) remove_all(path);
+			else if ((delf == del_files || delf == del_dir_files) && !is_directory(path)) remove(path);
 			return;
 		}
 		if (!checker(path.filename().string(), exeptions)) {
 			for (auto& it : directory_iterator(path)) {
 				if (is_directory(it.path())) {
 					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-						remove_all(it.path());
+						if (delf == del_dir || delf == del_dir_files) remove_all(it.path());
 					}
-					else del(it.path(), ext, exeptions);
+					else if (recf == recursion_on) del(it.path(), ext, exeptions);
 				}
 				else {
 					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-						remove(it.path());
+						if (delf == del_dir_files || delf == del_files) remove(it.path());
 					}
 				}
 			}
@@ -139,6 +139,7 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 	}
 }
 
+//добавить рекурсию
 void FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
 		if (count_f < 1) return;
