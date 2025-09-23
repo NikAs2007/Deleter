@@ -68,7 +68,7 @@ void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
 						if (delf == del_dir || delf == del_dir_files) remove_all(it.path());
 					}
-					else if (recf == recursion_on) del(it.path(), ext, exeptions);
+					else if (recf == recursion_on) async([&]() { del(it.path(), ext, exeptions); });
 				}
 				else {
 					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
@@ -80,6 +80,8 @@ void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 	}
 }
 
+
+//тут баш с рекурсией
 void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
@@ -102,7 +104,8 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
 							if (renf == ren_dir || renf == ren_dir_files) rename(it.path(), it.path().parent_path().string() + '\\' + name);
 						}
-						if (recf == recursion_on) ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name);
+						if (recf == recursion_on) async([&]() { ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name); });
+						//if (recf == recursion_on) ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name);
 					}
 					else {
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
@@ -130,7 +133,9 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 						} while (exists(new_name));
 						if (is_directory(it.path()) && (renf == ren_dir || renf == ren_dir_files) || !is_directory(it.path()) && (renf == ren_files || renf == ren_dir_files)) rename(it.path(), new_name);
 						if (is_directory(new_name)) {
-							if (recf == recursion_on) ren(new_name, ext, exeptions, name);
+							//тут разберись
+							if (recf == recursion_on) async([&]() { ren(new_name, ext, exeptions, name); });
+							//if (recf == recursion_on) ren(new_name, ext, exeptions, name);
 						}
 					}
 				}
@@ -139,14 +144,13 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 	}
 }
 
-//добавить рекурсию
 void FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
 		if (count_f < 1) return;
 		if (recf == recursion_on) {
 			for (auto& it : directory_iterator(path)) {
 				if (is_directory(it.path())) {
-					cre(it.path(), name, count_f);
+					async([&]() { cre(it.path(), name, count_f); });
 				}
 			}
 		}
@@ -255,7 +259,6 @@ void FileManager::ui_asking() {
 			}
 		}
 		else if (com == "2") {
-			//
 			string path, d = "", repath = "", new_name = "";
 			vector<string> ren_vec;
 			vector<string> exeptions;

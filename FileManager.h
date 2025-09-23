@@ -1,5 +1,4 @@
 //Добавить обработку ошибок при вводе
-//Добавить флаги: -rec/-recn - рекурсивный обход, -deld/-delf/-delfd - флаги для удаления, -cref/-cred - флаги для создания, -renf/-rend/renfd - флаги для переименования
 //Наверно стоит поменять поиск первой точки на поиск последней
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
@@ -11,6 +10,8 @@
 #include <vector>
 #include <locale>
 #include <windows.h>
+#include <thread>
+#include <future>
 using namespace std;
 using namespace std::filesystem;
 
@@ -48,6 +49,7 @@ class FileManager {
     bool checker(string name, vector<string>& del_list);
 
 public:
+    
     FileManager();
     void ui_asking();
 };
