@@ -50,9 +50,9 @@ protected:
 
     bool del(path path, vector<string>& ext, vector<string>& exeptions, bool first_call = true);
 
-    bool ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
+    bool ren(path path, vector<string>& ext, vector<string>& exeptions, string name, bool first_call = true);
 
-    bool cre(path path, string name, int count_f);
+    bool cre(path path, string name, int count_f, bool first_call = true);
 
     bool checker(string name, vector<string>& del_list);
 

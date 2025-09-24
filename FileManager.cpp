@@ -7,9 +7,9 @@ FileManager::FileManager() {
 	cref = cre_files;
 	renf = ren_dir_files;
 	regf = reg_off;
-	rootf = root_off;
+	rootf = root_on;
 	danger_chars = { '\\','/',':','*','?','"','<','>','|' };
-	avaliable_flags = { "-rec", "-nrec", "-deld", "-delf", "-delfd", "-cref", "-cred", "-renf", "-rend", "-renfd", "-reg", "-nreg" };
+	avaliable_flags = { "-rec", "-nrec", "-deld", "-delf", "-delfd", "-cref", "-cred", "-renf", "-rend", "-renfd", "-reg", "-nreg", "-root", "-nroot" };
 }
 
 bool FileManager::is_correct_flags_string(string flags_string) {
@@ -100,7 +100,7 @@ bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions,
 
 
 //тут баг - при переименовании файлов в тоже имя происходит конфликт между ними и num получает лишнии номера
-bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
+bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File", bool first_call) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			if ((is_directory(path) && (renf == ren_dir || renf == ren_dir_files)) || (!is_directory(path) && (renf == ren_files || renf == ren_dir_files))) rename(path, path.parent_path().string() + '\\' + name); 
@@ -174,43 +174,47 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 	return false;
 }
 
-bool FileManager::cre(path path, string name, int count_f) {
+bool FileManager::cre(path path, string name, int count_f, bool first_call) {
 	if (exists(path)) {
 		if (count_f < 1) return false;
+		bool this_first_call = first_call;
+		first_call = false;
 		if (recf == recursion_on) {
 			for (auto& it : directory_iterator(path)) {
 				if (is_directory(it.path())) {
-					cre(it.path(), name, count_f);
+					cre(it.path(), name, count_f, first_call);
 					//thread th([&]() { cre(it.path(), name, count_f); });
 					//th.detach();
 				}
 			}
 		}
-		if (count_f == 1) {
-			if (cref == cre_files) ofstream{ path.string() + '\\' + name };
-			else if (cref == cre_dir) create_directory(path.string() + '\\' + name);
-		}
-		else {
-			int num = 1;
-			for (int i = 0; i < count_f; i++) {
-				string new_name;
-				bool first_dot;
-				do {
-					new_name = path.string() + "\\";
-					first_dot = true;
-					for (int i = 0; i < name.length(); i++) {
-						if (name[i] != '.') {
-							new_name += name[i];
+		if (rootf == root_on || (rootf == root_off && !this_first_call)) {
+			if (count_f == 1) {
+				if (cref == cre_files) ofstream{ path.string() + '\\' + name };
+				else if (cref == cre_dir) create_directory(path.string() + '\\' + name);
+			}
+			else {
+				int num = 1;
+				for (int i = 0; i < count_f; i++) {
+					string new_name;
+					bool first_dot;
+					do {
+						new_name = path.string() + "\\";
+						first_dot = true;
+						for (int i = 0; i < name.length(); i++) {
+							if (name[i] != '.') {
+								new_name += name[i];
+							}
+							else if (first_dot) {
+								new_name += to_string(num++) + name[i];
+								first_dot = false;
+							}
 						}
-						else if (first_dot) {
-							new_name += to_string(num++) + name[i];
-							first_dot = false;
-						}
-					}
-					if (first_dot) new_name += to_string(num++);
-				} while (exists(new_name));
-				if (cref == cre_files) ofstream{ new_name };
-				else if (cref == cre_dir) create_directory(new_name);
+						if (first_dot) new_name += to_string(num++);
+					} while (exists(new_name));
+					if (cref == cre_files) ofstream{ new_name };
+					else if (cref == cre_dir) create_directory(new_name);
+				}
 			}
 		}
 		return true;
