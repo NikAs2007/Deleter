@@ -285,23 +285,28 @@ void FileManager::ui_asking() {
 				//тут ошибка
 				cout << "Введите новое имя объекта/объектов: ";
 				getline(cin, new_name);
-				cout << "Введите список файлов для переименования (если список закончен, то введите '.'): " << endl;
-				do {
-					if (d != ".") {
-						getline(cin, d);
-						ren_vec.push_back(d);
-					}
-				} while (d != ".");
-				d = "";
-				cout << "Введите список ключевых слов для исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'): " << endl;
-				do {
-					if (d != ".") {
-						getline(cin, d);
-						exeptions.push_back(d);
-					}
-				} while (d != ".");
-				ren(path, ren_vec, exeptions, new_name);
-				cout << "Переименовано\n" << endl;
+				if (!have_danger_characters(new_name)) {
+					cout << "Введите список файлов для переименования (если список закончен, то введите '.'): " << endl;
+					do {
+						if (d != ".") {
+							getline(cin, d);
+							ren_vec.push_back(d);
+						}
+					} while (d != ".");
+					d = "";
+					cout << "Введите список ключевых слов для исключений, это файлы, которые не будут удалены (если список закончен, то введите '.'): " << endl;
+					do {
+						if (d != ".") {
+							getline(cin, d);
+							exeptions.push_back(d);
+						}
+					} while (d != ".");
+					ren(path, ren_vec, exeptions, new_name);
+					cout << "Переименовано.\n" << endl;
+				}
+				else {
+					cout << "Имя имеет недопустимые символы: '\\', '/', ':', '*', '?', '\"', '<', '>', '|'.\n" << endl;
+				}
 			}
 			else {
 				cout << "Такого пути не существует\n" << endl;
@@ -335,7 +340,7 @@ void FileManager::ui_asking() {
 					}
 				} while (d != ".");
 				del(path, del_vec, exeptions);
-				cout << "Удалено\n"  << endl;
+				cout << "Удалено.\n"  << endl;
 			}
 			else {
 				cout << "Такого пути не существует\n" << endl;
