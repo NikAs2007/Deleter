@@ -60,7 +60,7 @@ bool FileManager::flags_parser(string all_flags) {
 	//cout << "Флаги успешно установлены.\n" << endl;
 }
 
-void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
+bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			if ((delf == del_dir || delf == del_dir_files) && is_directory(path)) remove_all(path);
@@ -82,10 +82,12 @@ void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 				}
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
-void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
+bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			if ((is_directory(path) && (renf == ren_dir || renf == ren_dir_files)) || (!is_directory(path) && (renf == ren_files || renf == ren_dir_files))) rename(path, path.parent_path().string() + '\\' + name); 
@@ -146,10 +148,12 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 				}
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
-void FileManager::cre(path path, string name, int count_f) {
+bool FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
 		if (count_f < 1) return;
 		if (recf == recursion_on) {
@@ -186,7 +190,9 @@ void FileManager::cre(path path, string name, int count_f) {
 				else if (cref == cre_dir) create_directory(new_name);
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
 //есть ошибка в чекере: исключение Hah1 это еще и Hah10 и др.

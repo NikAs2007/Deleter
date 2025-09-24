@@ -47,20 +47,20 @@ protected:
 
     virtual bool flags_parser(string all_flags);
 
-    void del(path path, vector<string>& ext, vector<string>& exeptions);
+    bool del(path path, vector<string>& ext, vector<string>& exeptions);
 
-    void ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
+    bool ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
 
-    void cre(path path, string name, int count_f);
+    bool cre(path path, string name, int count_f);
 
     bool checker(string name, vector<string>& del_list);
 
     bool have_danger_characters(string name);
 
 public:
-    
+
     FileManager();
-    //void ui_asking();
+
 };
 
 class FileManagerUI : public FileManager {
