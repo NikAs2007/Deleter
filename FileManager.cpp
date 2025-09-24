@@ -65,7 +65,7 @@ bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
 			if ((delf == del_dir || delf == del_dir_files) && is_directory(path)) remove_all(path);
 			else if ((delf == del_files || delf == del_dir_files) && !is_directory(path)) remove(path);
-			return;
+			return true;
 		}
 		if (!checker(path.filename().string(), exeptions)) {
 			for (auto& it : directory_iterator(path)) {
@@ -87,6 +87,8 @@ bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 	return false;
 }
 
+
+//тут баг - при переименовании файлов в тоже имя происходит конфликт между ними и num получает лишнии номера
 bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
@@ -114,7 +116,11 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 							new_name = it.path().string();
 						}
 						rename(it.path(), new_name);
-						if (recf == recursion_on) async([&]() { ren(new_name, ext, exeptions, name); });
+						if (recf == recursion_on) {
+							//async([&]() { ren(new_name, ext, exeptions, name); });
+							thread th(ren, new_name, ext, exeptions, name);
+							th.detach();
+						}
 					}
 					else {
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
@@ -142,7 +148,11 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 						} while (exists(new_name));
 						if (is_directory(it.path()) && (renf == ren_dir || renf == ren_dir_files) || !is_directory(it.path()) && (renf == ren_files || renf == ren_dir_files)) rename(it.path(), new_name);
 						if (is_directory(new_name)) {
-							if (recf == recursion_on) async([&]() { ren(new_name, ext, exeptions, name); });
+							if (recf == recursion_on) {
+								//async([&]() { ren(new_name, ext, exeptions, name); });
+								thread th(ren, new_name, ext, exeptions, name);
+								th.detach();
+							}
 						}
 					}
 				}
@@ -155,7 +165,7 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 
 bool FileManager::cre(path path, string name, int count_f) {
 	if (exists(path)) {
-		if (count_f < 1) return;
+		if (count_f < 1) return false;
 		if (recf == recursion_on) {
 			for (auto& it : directory_iterator(path)) {
 				if (is_directory(it.path())) {
@@ -195,7 +205,7 @@ bool FileManager::cre(path path, string name, int count_f) {
 	return false;
 }
 
-//есть ошибка в чекере: исключение Hah1 это еще и Hah10 и др.
+//есть ошибка в чекере: исключение Hah1 это еще и Hah10 и др. - исправил
 bool FileManager::checker(string name, vector<string>& str_list) {
 	if (regf == reg_off) {
 		transform(name.begin(), name.end(), name.begin(), [](char c) { return tolower((int)c); });
@@ -211,6 +221,7 @@ bool FileManager::checker(string name, vector<string>& str_list) {
 		int last_rs = 0;
 		bool starting = false;
 		bool flag_for_starting = false;
+		bool flag_for_ending = true;
 		while (right < str_list[i].length()) {
 			while (right < str_list[i].length() && str_list[i][right] != '*') {
 				right++;
@@ -230,12 +241,14 @@ bool FileManager::checker(string name, vector<string>& str_list) {
 			}
 			else {
 				if (starting && (l != 0) || !starting && (l == 0)) flag_for_starting = true;
+				//тут добавили флаг
+				if (right >= str_list[i].length() - 1 && !ending && ((l + rs - 1) < name.length() - 1)) flag_for_ending = false;
 				left = right + 1;
 				right = left;
 				rs = 0;
 			}
 		}
-		if (flag_for_starting && flag && ((ending && ((l + last_rs) < (name.length()))) || (!ending && ((l + last_rs) >= (name.length() - 1))))) return true;
+		if (flag_for_ending && flag_for_starting && flag && ((ending && ((l + last_rs) < (name.length()))) || (!ending && ((l + last_rs) >= (name.length() - 1))))) return true;
 	}
 	return false;
 }
