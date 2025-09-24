@@ -17,6 +17,7 @@ using namespace std;
 using namespace std::filesystem;
 
 class FileManager {
+protected:
     enum Flag {
         recursion_on,
         recursion_off,
@@ -46,11 +47,11 @@ class FileManager {
 
     void flags_parser(string all_flags);
 
-    void del(path path, vector<string>& ext, vector<string>& exeptions);
+    virtual void del(path path, vector<string>& ext, vector<string>& exeptions);
 
-    void ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
+    virtual void ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
 
-    void cre(path path, string name, int count_f);
+    virtual void cre(path path, string name, int count_f);
 
     bool checker(string name, vector<string>& del_list);
 
@@ -59,7 +60,19 @@ class FileManager {
 public:
     
     FileManager();
+    //void ui_asking();
+};
+
+class FileManagerUI : public FileManager {
+public:
     void ui_asking();
+     //повысили уровень доступа до public
+
+};
+
+class FileManagerBK : public FileManager {
+public:
+
 };
 
 #endif //FILEMANAGER_H
