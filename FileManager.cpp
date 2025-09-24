@@ -6,6 +6,7 @@ FileManager::FileManager() {
 	delf = del_dir_files;
 	cref = cre_files;
 	renf = ren_dir_files;
+	danger_chars = { '\\','/',':','*','?','"','<','>','|' };
 }
 
 bool FileManager::is_correct_flags_string(string flags_string) {
@@ -223,6 +224,13 @@ bool FileManager::checker(string name, vector<string>& del_list) {
 	return false;
 }
 
+bool FileManager::have_danger_characters(string name) {
+	for (char ch : danger_chars) {
+		if (find(name.begin(), name.end(), ch) != name.end()) return true;
+	}
+	return false;
+}
+
 void FileManager::ui_asking() {
 	while (!stop) {
 		cout << "Создать файлы [1]\nПереименовать файлы [2]\nУдалить список файлов/папок [3]\nЗадать флаги [4]\nПосмотреть информацию о флагах [5]\nЗакрыть [6]\nВыберите команду: ";
@@ -240,18 +248,23 @@ void FileManager::ui_asking() {
 			if (exists(path)) {
 				cout << "Введите имя создаваемого объекта: ";
 				getline(cin, name);
-				cout << "Введите количество создаваемых файлов: ";
-				getline(cin, d);
-				bool right_count = true;
-				for (char x : d) {
-					if (!isdigit(x)) right_count = false;
-				}
-				if (right_count) {
-					cre(path, name, stoi(d));
-					cout << "Создано.\n" << endl;
+				if (!have_danger_characters(name)) {
+					cout << "Введите количество создаваемых файлов: ";
+					getline(cin, d);
+					bool right_count = true;
+					for (char x : d) {
+						if (!isdigit(x)) right_count = false;
+					}
+					if (right_count) {
+						cre(path, name, stoi(d));
+						cout << "Создано.\n" << endl;
+					}
+					else {
+						cout << "Принимаются только числа!" << endl;
+					}
 				}
 				else {
-					cout << "Принимаются только числа!" << endl;
+					cout << "Имя имеет недопустимые символы: '\\', '/', ':', '*', '?', '\"', '<', '>', '|'.\n" << endl;
 				}
 			}
 			else {

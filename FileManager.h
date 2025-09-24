@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <thread>
 #include <future>
+#include <algorithm>
 using namespace std;
 using namespace std::filesystem;
 
@@ -33,6 +34,7 @@ class FileManager {
     Flag delf;
     Flag cref;
     Flag renf;
+    vector<char> danger_chars;
 
     bool stop;
 
@@ -47,6 +49,8 @@ class FileManager {
     void cre(path path, string name, int count_f);
 
     bool checker(string name, vector<string>& del_list);
+
+    bool have_danger_characters(string name);
 
 public:
     
