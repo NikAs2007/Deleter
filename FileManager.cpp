@@ -74,7 +74,7 @@ bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 						if (delf == del_dir || delf == del_dir_files) remove_all(it.path());
 					}
 					else if (recf == recursion_on) {
-						async([&]() { del(it.path(), ext, exeptions); });
+						del(it.path(), ext, exeptions);
 						//thread th([&](){ del(it.path(), ext, exeptions); });
 						//th.detach();
 					}
@@ -121,7 +121,7 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 						}
 						rename(it.path(), new_name);
 						if (recf == recursion_on) {
-							async([&]() { ren(new_name, ext, exeptions, name); });
+							ren(new_name, ext, exeptions, name);
 							//thread th([&]() { ren(new_name, ext, exeptions, name); });
 							//th.detach();
 						}
@@ -153,7 +153,7 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 						if (is_directory(it.path()) && (renf == ren_dir || renf == ren_dir_files) || !is_directory(it.path()) && (renf == ren_files || renf == ren_dir_files)) rename(it.path(), new_name);
 						if (is_directory(new_name)) {
 							if (recf == recursion_on) {
-								async([&]() { ren(new_name, ext, exeptions, name); });
+								ren(new_name, ext, exeptions, name);
 								//thread th([&]() { ren(new_name, ext, exeptions, name); });
 								//th.detach();
 							}
@@ -173,7 +173,7 @@ bool FileManager::cre(path path, string name, int count_f) {
 		if (recf == recursion_on) {
 			for (auto& it : directory_iterator(path)) {
 				if (is_directory(it.path())) {
-					async([&]() { cre(it.path(), name, count_f); });
+					cre(it.path(), name, count_f);
 					//thread th([&]() { cre(it.path(), name, count_f); });
 					//th.detach();
 				}

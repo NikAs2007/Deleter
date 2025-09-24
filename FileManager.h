@@ -13,8 +13,6 @@
 #include <vector>
 #include <locale>
 #include <windows.h>
-#include <thread>
-#include <future>
 #include <algorithm>
 using namespace std;
 using namespace std::filesystem;
