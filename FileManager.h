@@ -1,8 +1,5 @@
 
-//Наверно стоит поменять поиск первой точки на поиск последней
-//переопределить flags_parser для BK
 //добавить флаг чтобы функции не трогали корневую папку
-//АХХАХХА многопоточка херня - переделывай
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
@@ -31,7 +28,9 @@ protected:
         ren_dir,
         ren_dir_files,
         reg_on,
-        reg_off
+        reg_off,
+        root_on,
+        root_off
     };
 
     Flag recf;
@@ -39,6 +38,7 @@ protected:
     Flag cref;
     Flag renf;
     Flag regf;
+    Flag rootf;
     vector<char> danger_chars;
     vector<string> avaliable_flags;
 
@@ -48,7 +48,7 @@ protected:
 
     virtual bool flags_parser(string all_flags);
 
-    bool del(path path, vector<string>& ext, vector<string>& exeptions);
+    bool del(path path, vector<string>& ext, vector<string>& exeptions, bool first_call = true);
 
     bool ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
 

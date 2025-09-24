@@ -7,6 +7,7 @@ FileManager::FileManager() {
 	cref = cre_files;
 	renf = ren_dir_files;
 	regf = reg_off;
+	rootf = root_off;
 	danger_chars = { '\\','/',':','*','?','"','<','>','|' };
 	avaliable_flags = { "-rec", "-nrec", "-deld", "-delf", "-delfd", "-cref", "-cred", "-renf", "-rend", "-renfd", "-reg", "-nreg" };
 }
@@ -60,13 +61,19 @@ bool FileManager::flags_parser(string all_flags) {
 	//cout << "Флаги успешно установлены.\n" << endl;
 }
 
-bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions) {
+bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions, bool first_call) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
-			if ((delf == del_dir || delf == del_dir_files) && is_directory(path)) remove_all(path);
-			else if ((delf == del_files || delf == del_dir_files) && !is_directory(path)) remove(path);
-			return true;
+			if (rootf == root_on && first_call && (delf == del_dir || delf == del_dir_files) && is_directory(path)) {
+				remove_all(path);
+				return true;
+			}
+			else if ((delf == del_files || delf == del_dir_files) && !is_directory(path)) {
+				remove(path);
+				return true;
+			}
 		}
+		first_call = false;
 		if (!checker(path.filename().string(), exeptions)) {
 			for (auto& it : directory_iterator(path)) {
 				if (is_directory(it.path())) {
@@ -74,7 +81,7 @@ bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 						if (delf == del_dir || delf == del_dir_files) remove_all(it.path());
 					}
 					else if (recf == recursion_on) {
-						del(it.path(), ext, exeptions);
+						del(it.path(), ext, exeptions, first_call);
 						//thread th([&](){ del(it.path(), ext, exeptions); });
 						//th.detach();
 					}
