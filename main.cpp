@@ -7,6 +7,10 @@ int main()
     setlocale(LC_ALL, "Ru");
 
     FileManager filemanager;
-    filemanager.ui_asking();
+    FileManagerUI filemanagerui;
+    FileManagerBK filemanagerbk;
+
+    filemanagerui.ui_asking();
+
     return 0;
 }

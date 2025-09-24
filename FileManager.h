@@ -45,13 +45,13 @@ protected:
 
     bool is_correct_flags_string(string flags_string);
 
-    void flags_parser(string all_flags);
+    virtual bool flags_parser(string all_flags);
 
-    virtual void del(path path, vector<string>& ext, vector<string>& exeptions);
+    void del(path path, vector<string>& ext, vector<string>& exeptions);
 
-    virtual void ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
+    void ren(path path, vector<string>& ext, vector<string>& exeptions, string name);
 
-    virtual void cre(path path, string name, int count_f);
+    void cre(path path, string name, int count_f);
 
     bool checker(string name, vector<string>& del_list);
 
@@ -64,15 +64,21 @@ public:
 };
 
 class FileManagerUI : public FileManager {
+protected:
+    bool flags_parser(string all_flags) override;
 public:
     void ui_asking();
-     //повысили уровень доступа до public
-
 };
 
 class FileManagerBK : public FileManager {
 public:
-
+    using FileManager::checker; //повысили уровень доступа до public
+    using FileManager::ren;
+    using FileManager::del;
+    using FileManager::cre;
+    using FileManager::have_danger_characters;
+    using FileManager::is_correct_flags_string;
+    using FileManager::flags_parser;
 };
 
 #endif //FILEMANAGER_H
