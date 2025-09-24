@@ -6,13 +6,14 @@ FileManager::FileManager() {
 	delf = del_dir_files;
 	cref = cre_files;
 	renf = ren_dir_files;
+	regf = reg_off;
 	danger_chars = { '\\','/',':','*','?','"','<','>','|' };
+	avaliable_flags = { "-rec", "-nrec", "-deld", "-delf", "-delfd", "-cref", "-cred", "-renf", "-rend", "-renfd", "-reg", "-nreg" };
 }
 
 bool FileManager::is_correct_flags_string(string flags_string) {
 	string flag;
 	int i = 0;
-	vector<string> avaliable_flags = { "-rec", "-recn", "-deld", "-delf", "-delfd", "-cref", "-cred", "-renf", "-rend", "-renfd" };
 	while (i < flags_string.length()) {
 		while (i < flags_string.length() && flags_string[i] != '-') {
 			if (flags_string[i] != ' ') return false;
@@ -43,7 +44,7 @@ void FileManager::flags_parser(string all_flags) {
 			flag += all_flags[i++];
 		}
 		if (flag == "-rec") recf = recursion_on;
-		else if (flag == "-recn") recf = recursion_off;
+		else if (flag == "-nrec") recf = recursion_off;
 		else if (flag == "-deld") delf = del_dir;
 		else if (flag == "-delf") delf = del_files;
 		else if (flag == "-delfd") delf = del_dir_files;
@@ -52,6 +53,8 @@ void FileManager::flags_parser(string all_flags) {
 		else if (flag == "-renf") renf = ren_files;
 		else if (flag == "-rend") renf = ren_dir;
 		else if (flag == "-renfd") renf = ren_dir_files;
+		else if (flag == "-reg") regf = reg_on;
+		else if (flag == "-nreg") regf = reg_off;
 	}
 	cout << "Флаги успешно установлены.\n" << endl;
 }
@@ -186,8 +189,15 @@ void FileManager::cre(path path, string name, int count_f) {
 }
 
 //есть ошибка в чекере: исключение Hah1 это еще и Hah10 и др.
-bool FileManager::checker(string name, vector<string>& del_list) {
-	for (int i = 0; i < del_list.size(); i++) {
+bool FileManager::checker(string name, vector<string>& str_list) {
+	//тут работаем
+	if (regf == reg_off) {
+		transform(name.begin(), name.end(), name.begin(), [](char c) { return tolower((int)c); });
+		for (int i = 0; i < str_list.size(); i++) {
+			transform(str_list[i].begin(), str_list[i].end(), str_list[i].begin(), [](char c) { return tolower((int)c); });
+		}
+	}
+	for (int i = 0; i < str_list.size(); i++) {
 		int left = 0, right = 0;
 		int l = 0, rs = 0;
 		bool flag = true;
@@ -195,21 +205,21 @@ bool FileManager::checker(string name, vector<string>& del_list) {
 		int last_rs = 0;
 		bool starting = false;
 		bool flag_for_starting = false;
-		while (right < del_list[i].length()) {
-			while (right < del_list[i].length() && del_list[i][right] != '*') {
+		while (right < str_list[i].length()) {
+			while (right < str_list[i].length() && str_list[i][right] != '*') {
 				right++;
 			}
 			if (right == 0) starting = true;
 			if (right == 0) l++;
-			if (right == del_list[i].length() - 1) ending = true;
-			string sub = del_list[i].substr(left, right - left);
+			if (right == str_list[i].length() - 1) ending = true;
+			string sub = str_list[i].substr(left, right - left);
 			rs = sub.size();
 			while (rs + l < name.length() && name.substr(l, rs) != sub) {
 				l++;
 			}
 			last_rs = rs;
 			if (name.substr(l, rs) != sub) {
-				right = del_list[i].length();
+				right = str_list[i].length();
 				flag = false;
 			}
 			else {
@@ -360,7 +370,7 @@ void FileManager::ui_asking() {
 				cout << "Информация о флагах: \n" << endl;
 
 				cout << "-rec -> включает рекусривный обход всех вложенных папок для каждой функции" << endl;
-				cout << "-recn -> выключает" << endl;
+				cout << "-nrec -> выключает" << endl;
 				cout << endl;
 
 				cout << "-deld -> теперь удаляются только directories" << endl;
@@ -376,14 +386,18 @@ void FileManager::ui_asking() {
 				cout << "-renf -> переименовывает только files" << endl;
 				cout << "-renfd -> переименовывает files и directories" << endl;
 				cout << endl;
+
+				cout << "-reg -> учитывается регистр при проверках" << endl;
+				cout << "-nreg -> не учитывается" << endl;
+				cout << endl;
 			}
 			else if (d == "2") {
 				cout << "Флаги: \n" << endl;
 
 				if (recf == recursion_on) cout << "-rec: on" << endl;
 				else cout << "-rec: off" << endl;
-				if (recf == recursion_off) cout << "-recn: on" << endl;
-				else cout << "-recn: off\n";
+				if (recf == recursion_off) cout << "-nrec: on" << endl;
+				else cout << "-nrec: off\n";
 				cout << endl;
 
 				if (delf == del_dir) cout << "-deld: on" << endl;
@@ -406,6 +420,12 @@ void FileManager::ui_asking() {
 				else cout << "-renf: off" << endl;
 				if (renf == ren_dir_files) cout << "-renfd: on" << endl;
 				else cout << "-renfd: off\n";
+				cout << endl;
+
+				if (regf == reg_on) cout << "-reg: on" << endl;
+				else cout << "-reg: off" << endl;
+				if (regf == reg_off) cout << "-nreg: on" << endl;
+				else cout << "-nreg: off\n";
 				cout << endl;
 			}
 			else cout << "Такой команды нет.\n" << endl;

@@ -27,14 +27,18 @@ class FileManager {
         cre_dir,
         ren_files,
         ren_dir,
-        ren_dir_files
+        ren_dir_files,
+        reg_on,
+        reg_off
     };
 
     Flag recf;
     Flag delf;
     Flag cref;
     Flag renf;
+    Flag regf;
     vector<char> danger_chars;
+    vector<string> avaliable_flags;
 
     bool stop;
 

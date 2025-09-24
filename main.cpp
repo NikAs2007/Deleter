@@ -6,7 +6,7 @@ int main()
     //SetConsoleCP(65001);
     setlocale(LC_ALL, "Ru");
 
-    FileManager del;
-    del.ui_asking();
+    FileManager filemanager;
+    filemanager.ui_asking();
     return 0;
 }
