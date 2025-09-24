@@ -80,8 +80,6 @@ void FileManager::del(path path, vector<string>& ext, vector<string>& exeptions)
 	}
 }
 
-
-//тут баш с рекурсией
 void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File") {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
@@ -101,11 +99,15 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 			for (auto& it : directory_iterator(path)) {
 				if (count_files + count_folders <= 1) {
 					if (is_directory(it.path())) {
+						string new_name = it.path().parent_path().string();
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-							if (renf == ren_dir || renf == ren_dir_files) rename(it.path(), it.path().parent_path().string() + '\\' + name);
+							new_name += '\\' + name;
 						}
-						if (recf == recursion_on) async([&]() { ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name); });
-						//if (recf == recursion_on) ren(it.path().parent_path().string() + '\\' + name, ext, exeptions, name);
+						else {
+							new_name = it.path().string();
+						}
+						rename(it.path(), new_name);
+						if (recf == recursion_on) async([&]() { ren(new_name, ext, exeptions, name); });
 					}
 					else {
 						if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
@@ -133,9 +135,7 @@ void FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 						} while (exists(new_name));
 						if (is_directory(it.path()) && (renf == ren_dir || renf == ren_dir_files) || !is_directory(it.path()) && (renf == ren_files || renf == ren_dir_files)) rename(it.path(), new_name);
 						if (is_directory(new_name)) {
-							//тут разберись
 							if (recf == recursion_on) async([&]() { ren(new_name, ext, exeptions, name); });
-							//if (recf == recursion_on) ren(new_name, ext, exeptions, name);
 						}
 					}
 				}
