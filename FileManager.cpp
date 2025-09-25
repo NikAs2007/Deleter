@@ -100,12 +100,18 @@ bool FileManager::del(path path, vector<string>& ext, vector<string>& exeptions,
 
 
 //тут баг - при переименовании файлов в тоже имя происходит конфликт между ними и num получает лишнии номера
-bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name = "File", bool first_call) {
+//еще баг - нет рекурсивного обхода
+bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions, string name, bool first_call) {
 	if (exists(path)) {
 		if (!checker(path.filename().string(), exeptions) && checker(path.filename().string(), ext)) {
-			if ((is_directory(path) && (renf == ren_dir || renf == ren_dir_files)) || (!is_directory(path) && (renf == ren_files || renf == ren_dir_files))) rename(path, path.parent_path().string() + '\\' + name); 
-			path = path.parent_path().string() + '\\' + name;
+			if ((rootf == root_on || (rootf == root_off && !first_call)) && (is_directory(path) && (renf == ren_dir || renf == ren_dir_files)) || (!is_directory(path) && (renf == ren_files || renf == ren_dir_files))) {
+				//тут
+				//if (rootf == root_on || (rootf == root_off && !first_call)) rename(path, path.parent_path().string() + '\\' + name);
+				rename(path, path.parent_path().string() + '\\' + name);
+				path = path.parent_path().string() + '\\' + name;
+			}
 		}
+		first_call = false;
 		if (!checker(path.filename().string(), exeptions)) {
 			int count_files = 0;
 			int count_folders = 0;
@@ -127,8 +133,8 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 							new_name = it.path().string();
 						}
 						rename(it.path(), new_name);
-						if (recf == recursion_on) {
-							ren(new_name, ext, exeptions, name);
+						if (recf == recursion_on && (rootf == root_on || (rootf == root_off && !first_call))) {
+							ren(new_name, ext, exeptions, name, first_call);
 							//thread th([&]() { ren(new_name, ext, exeptions, name); });
 							//th.detach();
 						}
@@ -140,8 +146,8 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 					}
 				}
 				else {
+					string new_name = it.path().string();
 					if (!checker(it.path().filename().string(), exeptions) && checker(it.path().filename().string(), ext)) {
-						string new_name;
 						bool first_dot;
 						do {
 							new_name = it.path().parent_path().string() + "\\";
@@ -158,12 +164,12 @@ bool FileManager::ren(path path, vector<string>& ext, vector<string>& exeptions,
 							if (first_dot) new_name += to_string(num++);
 						} while (exists(new_name));
 						if (is_directory(it.path()) && (renf == ren_dir || renf == ren_dir_files) || !is_directory(it.path()) && (renf == ren_files || renf == ren_dir_files)) rename(it.path(), new_name);
-						if (is_directory(new_name)) {
-							if (recf == recursion_on) {
-								ren(new_name, ext, exeptions, name);
-								//thread th([&]() { ren(new_name, ext, exeptions, name); });
-								//th.detach();
-							}
+					}
+					if (is_directory(new_name) && !checker(it.path().filename().string(), exeptions)) {
+						if (recf == recursion_on && (rootf == root_on || (rootf == root_off && !first_call))) {
+							ren(new_name, ext, exeptions, name, first_call);
+							//thread th([&]() { ren(new_name, ext, exeptions, name); });
+							//th.detach();
 						}
 					}
 				}
@@ -222,7 +228,6 @@ bool FileManager::cre(path path, string name, int count_f, bool first_call) {
 	return false;
 }
 
-//есть ошибка в чекере: исключение Hah1 это еще и Hah10 и др. - исправил
 bool FileManager::checker(string name, vector<string>& str_list) {
 	if (regf == reg_off) {
 		transform(name.begin(), name.end(), name.begin(), [](char c) { return tolower((int)c); });
