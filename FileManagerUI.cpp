@@ -28,6 +28,8 @@ bool FileManagerUI::flags_parser(string all_flags) {
 		else if (flag == "-renfd") renf = ren_dir_files;
 		else if (flag == "-reg") regf = reg_on;
 		else if (flag == "-nreg") regf = reg_off;
+		else if (flag == "-root") rootf = root_on;
+		else if (flag == "-nroot") rootf = root_off;
 	}
 	cout << "Флаги успешно установлены.\n" << endl;
 	return true;
@@ -181,6 +183,10 @@ void FileManagerUI::ui_asking() {
 				cout << "-reg -> учитывается регистр при проверках" << endl;
 				cout << "-nreg -> не учитывается" << endl;
 				cout << endl;
+
+				cout << "-root -> функции переименования, создания и удаления работают с корневой папкой" << endl;
+				cout << "-nroot -> функции переименования и удаления не затрагивают корневую папку, даже если она попала в список выбранных шаблонов, а функция создания не создает ничего в корневой папке" << endl;
+				cout << endl;
 			}
 			else if (d == "2") {
 				cout << "Флаги: \n" << endl;
@@ -217,6 +223,12 @@ void FileManagerUI::ui_asking() {
 				else cout << "-reg: off" << endl;
 				if (regf == reg_off) cout << "-nreg: on" << endl;
 				else cout << "-nreg: off\n";
+				cout << endl;
+
+				if (regf == root_on) cout << "-root: on" << endl;
+				else cout << "-root: off" << endl;
+				if (regf == root_off) cout << "-nroot: on" << endl;
+				else cout << "-nroot: off\n";
 				cout << endl;
 			}
 			else cout << "Такой команды нет.\n" << endl;

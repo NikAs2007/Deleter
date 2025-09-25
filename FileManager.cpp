@@ -56,6 +56,8 @@ bool FileManager::flags_parser(string all_flags) {
 		else if (flag == "-renfd") renf = ren_dir_files;
 		else if (flag == "-reg") regf = reg_on;
 		else if (flag == "-nreg") regf = reg_off;
+		else if (flag == "-root") rootf = root_on;
+		else if (flag == "-nroot") rootf = root_off;
 	}
 	return true;
 	//cout << "Флаги успешно установлены.\n" << endl;
